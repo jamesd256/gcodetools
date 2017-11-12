@@ -4300,6 +4300,8 @@ class Gcodetools(inkex.Effect):
 					"4th axis scale": 1.,
 					"4th axis offset": 0.,
 					"lift knife at corner": 0.,
+					"knife lift threshold angle": 0.,
+					"4th axis command": "A",
 					"passing feed":"800",					
 					"fine feed":"800",					
 				}			
@@ -4617,12 +4619,13 @@ class Gcodetools(inkex.Effect):
 					a = atan2_(-s[2][1]+s[0][1],s[2][0]-s[0][0]) + pi
 			# calculate all vars		
 			a = calculate_angle(a, current_a)
-			axis4 = " A%f"%((a+s[3])*tool['4th axis scale']+tool['4th axis offset']) if s[1]=="arc" else ""
+			axis4 = " %s%f"%(tool["4th axis command"],(a+s[3])*tool['4th axis scale']+tool['4th axis offset']) if s[1]=="arc" else ""
 			if not forse and ( abs((a-current_a)%pi2)<TURN_KNIFE_ANGLE_TOLERANCE or abs((a-current_a)%pi2 - pi2)<TURN_KNIFE_ANGLE_TOLERANCE ) : 
 				g = ""
 			else :	
-				g = "A%f  (Turn knife)\n" % (a*tool['4th axis scale']+tool['4th axis offset'])
-				if tool['lift knife at corner']!=0. :
+				g = "%s%f  (Turn knife %s degrees)\n"%(tool["4th axis command"],a*tool['4th axis scale']+tool['4th axis offset'],a * (180/pi))
+				turn_magnitude = abs(a-current_a) * (180/pi)
+				if tool['lift knife at corner']!=0. and turn_magnitude > tool['knife lift threshold angle']:
 					g = "G00 Z%f  (Lift up)\n"%(depth+tool['lift knife at corner']) + "G00 "+ g + "G01 Z%f %s (Penetrate back)\n"%(depth,penetration_feed)
 				else : 	
 					g = "G01 "+g
@@ -6972,6 +6975,8 @@ class Gcodetools(inkex.Effect):
 					"4th axis scale": 1.,
 					"4th axis offset": 0,
 					"lift knife at corner": 0.,
+					"knife lift threshold angle": 0.,
+					"4th axis command": "A",
 					"tool change gcode":" "
 			}
 			
@@ -7873,4 +7878,3 @@ G01 Z1 (going to cutting z)\n""",
 #						
 gcodetools = Gcodetools()
 gcodetools.affect()					
-
