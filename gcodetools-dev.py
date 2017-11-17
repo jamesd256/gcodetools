@@ -4286,6 +4286,7 @@ class Gcodetools(inkex.Effect):
 					"shape": "10",
 					"penetration angle":90.,
 					"penetration feed":100.,
+					"turn feed":100.,
 					"depth step":1.,
 					"feed":400.,
 					"in trajectory":"",
@@ -4625,7 +4626,7 @@ class Gcodetools(inkex.Effect):
 				g = ""
 			else :	
 				a_turn_angle = (a*tool['4th axis scale']+tool['4th axis offset']) * (180/pi)
-				g = "%s%f  (Turn knife %s degrees)\n"%(tool["4th axis command"],a_turn_angle,a * (180/pi))
+				g = "%s%f F%i (Turn knife %s degrees)\n"%(tool["4th axis command"],a_turn_angle,tool['turn feed'],a * (180/pi))
 				turn_magnitude = abs(a-current_a) * (180/pi)
 				if tool['lift knife at corner']!=0. and turn_magnitude > tool['knife lift threshold angle']:
 					g = "G00 Z%f  (Lift up)\n"%(self.options.Zsafe) + "G00 "+ g + "G01 Z%f %s (Penetrate back)\n"%(depth,penetration_feed)
@@ -6972,6 +6973,7 @@ class Gcodetools(inkex.Effect):
 					"id": "Tangent knife 0001",
 					"feed":"900",
 					"penetration feed":"900",
+					"turn feed":"4000",
 					"depth step":"1",
 					"4th axis meaning": "tangent knife",
 					"4th axis scale": 1.,
