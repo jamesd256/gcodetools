@@ -5430,6 +5430,7 @@ class Gcodetools(inkex.Effect):
 				except:
 					self.error("Bad depth function! Enter correct function at Path to Gcode tab!")
 
+				# Clear path ids in ordered selection list
 				count = 0
 				renamed_ids = []
 				for i in self.options.ids:
@@ -5439,6 +5440,7 @@ class Gcodetools(inkex.Effect):
 					path.set("id", newName)
 					renamed_ids.append(newName)
 
+				# Set new ids for paths in order of selection
 				count = 0
 				for i in renamed_ids:
 					count += 1
