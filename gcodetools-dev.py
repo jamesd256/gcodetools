@@ -90,6 +90,7 @@ _ = gettext.gettext
 from biarc import *
 from points import P
 import ast
+import operator
 
 ### Check if inkex has errormsg (0.46 version does not have one.) Could be removed later.
 if "errormsg" not in dir(inkex):
@@ -5384,6 +5385,9 @@ class Gcodetools(inkex.Effect):
 			# self.error(depth)
 			return depth
 
+		def getPathId(path):
+			return path.get("id")
+
 		if self.selected_paths == {} and self.options.auto_select_paths:
 			paths=self.paths
 			self.error(_("No paths are selected! Trying to work on all available paths."),"warning")
@@ -5411,7 +5415,10 @@ class Gcodetools(inkex.Effect):
 				except:
 					self.error("Bad depth function! Enter correct function at Path to Gcode tab!")
 
-				for path in paths[layer] :
+
+				for path in (sorted(paths[layer], key=getPathId,reverse=True)):
+				#for path in paths[layer] :
+					#sys.stderr.write(path.get("id"))
 					d = getDfrompath(path)
 					if d == None:
 						 self.error(_("Warning: One or more paths do not have 'd' parameter, try to Ungroup (Ctrl+Shift+G) and Object to Path (Ctrl+Shift+C)!"),"selection_contains_objects_that_are_not_paths")
