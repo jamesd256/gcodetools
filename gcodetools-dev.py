@@ -90,7 +90,20 @@ _ = gettext.gettext
 from biarc import *
 from points import P
 import ast
-import operator
+
+# a dictionary of all of the xmlns prefixes in a standard inkscape doc
+NSS = {
+u'sodipodi' :u'http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd',
+u'cc'       :u'http://creativecommons.org/ns#',
+u'ccOLD'    :u'http://web.resource.org/cc/',
+u'svg'      :u'http://www.w3.org/2000/svg',
+u'dc'       :u'http://purl.org/dc/elements/1.1/',
+u'rdf'      :u'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+u'inkscape' :u'http://www.inkscape.org/namespaces/inkscape',
+u'xlink'    :u'http://www.w3.org/1999/xlink',
+u'xml'      :u'http://www.w3.org/XML/1998/namespace'
+}
+
 
 ### Check if inkex has errormsg (0.46 version does not have one.) Could be removed later.
 if "errormsg" not in dir(inkex):
@@ -5400,6 +5413,8 @@ class Gcodetools(inkex.Effect):
 		print_(("self.layers=",self.layers))
 		print_(("paths=",paths))
 		colors = {}
+
+
 		for layer in self.layers :
 			if layer in paths :
 				print_(("layer",layer))
@@ -5415,10 +5430,22 @@ class Gcodetools(inkex.Effect):
 				except:
 					self.error("Bad depth function! Enter correct function at Path to Gcode tab!")
 
+				count = 0
+				renamed_ids = []
+				for i in self.options.ids:
+					count += 1
+					path = self.getElementById(i)
+					newName = "clear_name_%i" % count
+					path.set("id", newName)
+					renamed_ids.append(newName)
 
-				for path in (sorted(paths[layer], key=getPathId,reverse=True)):
-				#for path in paths[layer] :
-					#sys.stderr.write(path.get("id"))
+				count = 0
+				for i in renamed_ids:
+					count += 1
+					path = self.getElementById(i)
+					path.set("id", "new_id_%i" % count)
+
+				for path in (sorted(paths[layer], key=getPathId)):
 					d = getDfrompath(path)
 					if d == None:
 						 self.error(_("Warning: One or more paths do not have 'd' parameter, try to Ungroup (Ctrl+Shift+G) and Object to Path (Ctrl+Shift+C)!"),"selection_contains_objects_that_are_not_paths")
